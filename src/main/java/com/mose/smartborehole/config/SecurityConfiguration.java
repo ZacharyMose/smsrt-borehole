@@ -42,10 +42,7 @@ public class SecurityConfiguration {
                         .permitAll()
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/sensors/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE,"/api/boreholes").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/api/boreholes").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/boreholes").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/api/boreholes/**").permitAll()
+                        .requestMatchers("/api/boreholes/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/maintenance").hasAnyRole("ADMIN","TECHNICIAN")
                         .requestMatchers(HttpMethod.GET,"/api/maintenance/**").authenticated()
                         .anyRequest()
@@ -85,3 +82,7 @@ public class SecurityConfiguration {
         return source;
     }
 }
+
+/*.requestMatchers(HttpMethod.DELETE,"/api/boreholes").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/boreholes").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/boreholes").hasRole("ADMIN")*/
