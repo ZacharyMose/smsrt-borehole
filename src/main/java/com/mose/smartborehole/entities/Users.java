@@ -35,7 +35,7 @@ public class Users implements UserDetails {
 
 
     @ManyToMany(mappedBy = "technicians")
-    private List<Boreholes> assignedBoreholes;
+    private List<Boreholes> boreholes;
 
     @ManyToOne
     @JoinColumn(name = "borehole_id")

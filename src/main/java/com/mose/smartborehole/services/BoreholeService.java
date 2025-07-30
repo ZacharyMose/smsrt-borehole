@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,92 +22,86 @@ public class BoreholeService {
     private final BoreholeRepository boreholeRepository;
     private final UserRepository userRepository;
 
-    public BoreholeResponse createBorehole(BoreholeData request) {
-        Users admin = userRepository.findById(request.getAdminId())
+    // Create
+    public BoreholeResponse create(BoreholeData data) {
+        Users admin = userRepository.findById(data.getAdminId())
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
 
-        List<Users> technicians = userRepository.findAllById(request.getTechnicianIds());
+        List<Users> technicians = userRepository.findAllById(data.getTechnicianIds());
+        System.out.println("Technicians found: " + technicians.size());
+        technicians.forEach(t -> System.out.println(t.getId() + " - " + t.getUsername()));
 
-        Boreholes borehole = new Boreholes();
-        borehole.setName(request.getName());
-        borehole.setLocation(request.getLocation());
+        Boreholes borehole = Boreholes.builder()
+                .name(data.getName())
+                .location(data.getLocation())
+                .admin(admin)
+                .technicians(technicians)
+                .build();
+
+        Boreholes saved = boreholeRepository.save(borehole);
+        System.out.println("Saved technicians: " + saved.getTechnicians().size());
+        return mapToDTO(saved);
+    }
+
+    // Read all
+    public List<BoreholeResponse> getAll() {
+        List<Boreholes> boreholes = boreholeRepository.findAll();
+
+        return boreholes.stream().map(borehole -> {
+            List<TechnicianDTO> techs = borehole.getTechnicians().stream()
+                    .map(user -> new TechnicianDTO(user.getUsername(), user.getEmail()))
+                    .collect(Collectors.toList());
+
+            return BoreholeResponse.builder()
+                    .id(borehole.getId())
+                    .name(borehole.getName())
+                    .location(borehole.getLocation())
+                    .technicians(techs)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    // Read by ID
+    public BoreholeResponse getById(UUID id) {
+        Boreholes borehole = boreholeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Borehole not found"));
+        return mapToDTO(borehole);
+    }
+
+    // Update
+    public BoreholeResponse update(UUID id, BoreholeData data) {
+        Boreholes borehole = boreholeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Borehole not found"));
+
+        Users admin = userRepository.findById(data.getAdminId())
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        List<Users> technicians = userRepository.findAllById(data.getTechnicianIds());
+
+        borehole.setName(data.getName());
+        borehole.setLocation(data.getLocation());
         borehole.setAdmin(admin);
         borehole.setTechnicians(technicians);
 
-        Boreholes saved = boreholeRepository.save(borehole);
-
-        return mapToResponse(saved);
+        return mapToDTO(boreholeRepository.save(borehole));
     }
 
-    private BoreholeResponse mapToResponse(Boreholes borehole) {
-        BoreholeResponse response = new BoreholeResponse();
-        response.setId(borehole.getId());
-        response.setName(borehole.getName());
-        response.setLocation(borehole.getLocation());
-
-        // Set Admin
-        UserDTO adminDTO = new UserDTO();
-        adminDTO.setId(borehole.getAdmin().getId());
-        adminDTO.setUsername(borehole.getAdmin().getUsername());
-        adminDTO.setEmail(borehole.getAdmin().getEmail());
-        response.setAdmin(adminDTO);
-
-        // Set Technicians
-        List<UserDTO> techDTOs = new ArrayList<>();
-        for (Users tech : borehole.getTechnicians()) {
-            UserDTO dto = new UserDTO();
-            dto.setId(tech.getId());
-            dto.setUsername(tech.getUsername());
-            dto.setEmail(tech.getEmail());
-            techDTOs.add(dto);
-        }
-        response.setTechnicians(techDTOs);
-
-        return response;
+    // Delete
+    public void delete(UUID id) {
+        boreholeRepository.deleteById(id);
     }
 
+    // Helper: map to DTO
+    private BoreholeResponse mapToDTO(Boreholes borehole) {
+        List<TechnicianDTO> techs = borehole.getTechnicians().stream()
+                .map(tech -> new TechnicianDTO( tech.getUsername(), tech.getEmail()))
+                .collect(Collectors.toList());
 
-    public List<Boreholes> getAllBoreholes() {
-        return boreholeRepository.findAll();
+        return new BoreholeResponse(
+                borehole.getId(),
+                borehole.getName(),
+                borehole.getLocation(),
+                techs
+        );
     }
-
-    public List<String> getEmailsForBoreholeTeam(UUID boreholeId) {
-        Boreholes borehole = boreholeRepository.findById(boreholeId)
-                .orElseThrow(() -> new RuntimeException("Borehole not found"));
-
-        List<String> emails = new ArrayList<>();
-
-        // Add admin email
-        if (borehole.getAdmin() != null) {
-            emails.add(borehole.getAdmin().getEmail());
-        }
-
-        // Add technician emails
-        for (Users tech : borehole.getTechnicians()) {
-            emails.add(tech.getEmail());
-        }
-
-        return emails;
-    }
-    public BoreholeTeamResponse getBoreholeTeam(UUID boreholeId) {
-        Boreholes borehole = boreholeRepository.findById(boreholeId)
-                .orElseThrow(() -> new RuntimeException("Borehole not found"));
-
-        List<TeamMemberDTO> team = new ArrayList<>();
-
-        // Add admin
-        Users admin = borehole.getAdmin();
-        if (admin != null) {
-            team.add(new TeamMemberDTO(admin.getUsername(), admin.getEmail()));
-        }
-
-        // Add technicians
-        for (Users tech : borehole.getTechnicians()) {
-            team.add(new TeamMemberDTO(tech.getUsername(), tech.getEmail()));
-        }
-
-        return new BoreholeTeamResponse(team);
-    }
-
-
 }

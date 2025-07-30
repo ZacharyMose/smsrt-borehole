@@ -16,12 +16,18 @@ import java.util.UUID;
 @Builder
 public class Sensors {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
-    private Double distance;
-    private Double waterLevel;
+    private Float waterLevel;
+    private Float distance; // From ultrasonic
     private String pumpStatus;
+
     private LocalDateTime timestamp;
+
+    @ManyToOne
+    @JoinColumn(name = "borehole_id")
+    private Boreholes borehole;
+
 
 }

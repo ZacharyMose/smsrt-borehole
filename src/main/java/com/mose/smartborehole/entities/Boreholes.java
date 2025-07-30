@@ -19,11 +19,10 @@ import java.util.UUID;
 public class Boreholes {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String name;
-
     private String location;
 
     @ManyToOne

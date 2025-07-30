@@ -8,6 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MaintenanceRepository extends JpaRepository<MaintenanceLogs, UUID> {
-    List<MaintenanceLogs> findByBorehole(Boreholes borehole);
-    List<MaintenanceLogs> findByBorehole_Id(UUID boreholeId);
+    List<MaintenanceLogs> findByBoreholeId(UUID boreholeId);
 }

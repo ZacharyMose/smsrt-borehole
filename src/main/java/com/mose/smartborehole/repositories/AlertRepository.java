@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface AlertRepository extends JpaRepository<Alerts, Long> {
-    List<Alerts> findByUserOrderByCreatedAtDesc(Users user);
+public interface AlertRepository extends JpaRepository<Alerts, UUID> {
+    List<Alerts> findByBoreholeId(UUID boreholeId);
 }

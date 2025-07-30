@@ -18,6 +18,7 @@ public class UserDTO {
     private UUID id;
     private String email;
     private Role role;
+    private String password;
 
     public UserDTO(String username, String email) {
         this.username = username;
@@ -32,21 +33,7 @@ public class UserDTO {
         return email;
     }
 
-    public static UserDTO fromEntity(Users userEntity) {
-        return UserDTO.builder()
-                .id(UUID.randomUUID())
-                .username(userEntity.getUsername())
-                .email(userEntity.getEmail())
-                .role(userEntity.getRole())
-                .build();
-    }
-
-    public static Users toEntity(UserDTO userDTO) {
-        return Users.builder()
-                .id(UUID.randomUUID())
-                .username(userDTO.getUsername())
-                .email(userDTO.getEmail())
-                .role(userDTO.getRole())
-                .build();
+    public String getPassword() {
+        return password;
     }
 }

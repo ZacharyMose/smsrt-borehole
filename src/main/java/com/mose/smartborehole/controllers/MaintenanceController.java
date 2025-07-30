@@ -1,8 +1,7 @@
 package com.mose.smartborehole.controllers;
 
 import com.mose.smartborehole.dto.MaintenanceLogDTO;
-import com.mose.smartborehole.dto.MaintenanceLogRequest;
-import com.mose.smartborehole.entities.MaintenanceLogs;
+import com.mose.smartborehole.response.MaintenanceLogsResponse;
 import com.mose.smartborehole.services.MaintenanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,22 +15,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/maintenance")
 public class MaintenanceController {
-
-    private final MaintenanceService logsService;
+    private final MaintenanceService maintenanceLogService;
 
     @PostMapping
-    public ResponseEntity<MaintenanceLogs> createLog(@RequestBody MaintenanceLogRequest dto) {
-        var log = logsService.createLog(dto);
-        return ResponseEntity.ok(log);
+    public ResponseEntity<MaintenanceLogsResponse> createLog(@RequestBody MaintenanceLogDTO request, Authentication auth) {
+        return ResponseEntity.ok(maintenanceLogService.create(request, auth));
     }
 
     @GetMapping
-    public ResponseEntity<List<MaintenanceLogs>> getAllLogs() {
-        return ResponseEntity.ok(logsService.getAllLogs());
+    public ResponseEntity<List<MaintenanceLogsResponse>> getAllLogs() {
+        return ResponseEntity.ok(maintenanceLogService.getAll());
     }
 
     @GetMapping("/borehole/{id}")
-    public ResponseEntity<List<MaintenanceLogs>> getLogsByBorehole(@PathVariable UUID id) {
-        return ResponseEntity.ok(logsService.getLogsByBorehole(id));
+    public ResponseEntity<List<MaintenanceLogsResponse>> getByBorehole(@PathVariable UUID id) {
+        return ResponseEntity.ok(maintenanceLogService.getByBorehole(id));
     }
 }

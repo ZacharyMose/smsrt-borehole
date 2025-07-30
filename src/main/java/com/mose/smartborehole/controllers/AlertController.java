@@ -1,5 +1,6 @@
 package com.mose.smartborehole.controllers;
 
+import com.mose.smartborehole.dto.AlertDTO;
 import com.mose.smartborehole.entities.Alerts;
 import com.mose.smartborehole.entities.Users;
 import com.mose.smartborehole.services.AlertService;
@@ -17,22 +18,20 @@ import java.util.UUID;
 @RequestMapping("/api/alerts")
 @RequiredArgsConstructor
 public class AlertController {
-    private final AlertService alertsService;
 
-    private final UserService userService;
+    private final AlertService alertService;
 
-    // 🔔 Get all alerts for current user
-    @GetMapping
-    public ResponseEntity<List<Alerts>> getAlerts(@RequestParam UUID userId) {
-        Users user = userService.getUserById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return ResponseEntity.ok(alertsService.getUserAlerts(user));
+    // Trigger alert generation
+    @PostMapping("/generate/{boreholeId}")
+    public ResponseEntity<List<AlertDTO>> generateAlerts(@PathVariable UUID boreholeId) {
+        List<AlertDTO> alerts = alertService.generateAlertsForBorehole(boreholeId);
+        return ResponseEntity.ok(alerts);
     }
 
-    // ✅ Mark alert as read
-    @PutMapping("/{id}/read")
-    public ResponseEntity<?> markAlertAsRead(@PathVariable Long id) {
-        alertsService.markAsRead(id);
-        return ResponseEntity.ok().build();
+    // Get all alerts for a borehole
+    @GetMapping("/{boreholeId}")
+    public ResponseEntity<List<AlertDTO>> getAlerts(@PathVariable UUID boreholeId) {
+        List<AlertDTO> alerts = alertService.getAlertsForBorehole(boreholeId);
+        return ResponseEntity.ok(alerts);
     }
 }

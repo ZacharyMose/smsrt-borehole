@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -15,27 +16,12 @@ import java.time.LocalDateTime;
 @Builder
 public class Alerts {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private UUID id;
 
-    private String title;
-
-    @Column(length = 1000)
+    private String type; // e.g. LOW_WATER_LEVEL, TANK_EMPTY
     private String message;
 
-    private boolean read = false;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user;
-
-    public Alerts(String title, String message, Users user) {
-        this.title = title;
-        this.message = message;
-        this.user = user;
-        this.createdAt = LocalDateTime.now();
-        this.read = false;
-    }
+    private UUID boreholeId;
+    private LocalDateTime timestamp;
 }

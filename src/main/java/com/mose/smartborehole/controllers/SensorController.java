@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,13 +17,13 @@ public class SensorController {
     private final SensorService sensorService;
 
     @PostMapping
-    public ResponseEntity<?> saveSensorData(@RequestBody SensorData dto) {
-        sensorService.save(dto);
-        return ResponseEntity.ok("Sensor data saved.");
+    public ResponseEntity<String> receiveSensorData(@RequestBody SensorData dto) {
+        sensorService.receiveSensorData(dto);
+        return ResponseEntity.ok("Sensor data received");
     }
 
-    @GetMapping
-    public ResponseEntity<List<Sensors>> getAll() {
-        return ResponseEntity.ok(sensorService.getAll());
+    @GetMapping("/latest/{boreholeId}")
+    public ResponseEntity<List<Sensors>> getLatest(@PathVariable UUID boreholeId) {
+        return ResponseEntity.ok(sensorService.getLatestForBorehole(boreholeId));
     }
 }

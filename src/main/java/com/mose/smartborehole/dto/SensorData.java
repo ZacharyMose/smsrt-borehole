@@ -2,9 +2,13 @@ package com.mose.smartborehole.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Data
 public class SensorData {
-    private Double distance;
-    private Double waterLevel;
+    private Float waterLevel;
+    private Float distance;
     private String pumpStatus;
+    private UUID boreholeId;
 }
