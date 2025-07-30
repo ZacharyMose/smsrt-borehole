@@ -15,17 +15,27 @@ import java.time.LocalDateTime;
 @Builder
 public class Alerts {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String alertType; // low_water, pump_failure, etc.
-    private String message;
-    private String sentVia;   // sms, email, in-app
-    private boolean resolved;
+    private String title;
 
-    private LocalDateTime timestamp;
+    @Column(length = 1000)
+    private String message;
+
+    private boolean read = false;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "device_id")
-    private Devices device;
+    @JoinColumn(name = "user_id")
+    private Users user;
+
+    public Alerts(String title, String message, Users user) {
+        this.title = title;
+        this.message = message;
+        this.user = user;
+        this.createdAt = LocalDateTime.now();
+        this.read = false;
+    }
 }

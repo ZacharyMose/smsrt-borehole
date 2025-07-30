@@ -19,6 +19,19 @@ public class UserDTO {
     private String email;
     private Role role;
 
+    public UserDTO(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
+
+    public String getName() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
     public static UserDTO fromEntity(Users userEntity) {
         return UserDTO.builder()
                 .id(UUID.randomUUID())

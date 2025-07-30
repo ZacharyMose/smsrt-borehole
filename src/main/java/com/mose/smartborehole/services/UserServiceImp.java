@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,11 @@ public class UserServiceImp implements UserService {
     @Override
     public Optional<Users> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<Users> getUserById(UUID id) {
+        return userRepository.findById(id);
     }
 
     private UserDTO mapToDto(Users user) {

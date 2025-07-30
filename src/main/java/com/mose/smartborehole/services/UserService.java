@@ -5,10 +5,12 @@ import com.mose.smartborehole.entities.Users;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 public interface UserService {
     UserDTO createUser(UserDTO dto); // Admin-only
     List<UserDTO> getAllUsers();
     Optional<Users> findByEmail(String email);
+    Optional<Users> getUserById(UUID id);
 }

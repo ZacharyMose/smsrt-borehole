@@ -1,18 +1,19 @@
 package com.mose.smartborehole.services;
 
 import com.mose.smartborehole.dto.BoreholeData;
+import com.mose.smartborehole.dto.TeamMemberDTO;
+import com.mose.smartborehole.dto.TechnicianDTO;
 import com.mose.smartborehole.dto.UserDTO;
 import com.mose.smartborehole.entities.Boreholes;
 import com.mose.smartborehole.entities.Users;
 import com.mose.smartborehole.repositories.BoreholeRepository;
 import com.mose.smartborehole.repositories.UserRepository;
 import com.mose.smartborehole.response.BoreholeResponse;
+import com.mose.smartborehole.response.BoreholeTeamResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -87,5 +88,25 @@ public class BoreholeService {
 
         return emails;
     }
+    public BoreholeTeamResponse getBoreholeTeam(UUID boreholeId) {
+        Boreholes borehole = boreholeRepository.findById(boreholeId)
+                .orElseThrow(() -> new RuntimeException("Borehole not found"));
+
+        List<TeamMemberDTO> team = new ArrayList<>();
+
+        // Add admin
+        Users admin = borehole.getAdmin();
+        if (admin != null) {
+            team.add(new TeamMemberDTO(admin.getUsername(), admin.getEmail()));
+        }
+
+        // Add technicians
+        for (Users tech : borehole.getTechnicians()) {
+            team.add(new TeamMemberDTO(tech.getUsername(), tech.getEmail()));
+        }
+
+        return new BoreholeTeamResponse(team);
+    }
+
 
 }

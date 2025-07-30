@@ -20,7 +20,8 @@ public class SensorService {
         Sensors data = new Sensors();
         data.setDistance(dto.getDistance());
         data.setTimestamp(LocalDateTime.now());
-        data.setVibration(dto.getVibration());
+        data.setWaterLevel(dto.getWaterLevel());
+        data.setPumpStatus(dto.getPumpStatus());
 
         repository.save(data);
     }

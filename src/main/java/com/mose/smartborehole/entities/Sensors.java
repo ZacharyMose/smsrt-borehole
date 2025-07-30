@@ -20,7 +20,8 @@ public class Sensors {
     private UUID id;
 
     private Double distance;
-    private Double vibration;
+    private Double waterLevel;
+    private String pumpStatus;
     private LocalDateTime timestamp;
 
 }

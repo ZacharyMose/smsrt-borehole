@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -35,5 +36,5 @@ public class Boreholes {
             joinColumns = @JoinColumn(name = "borehole_id"),
             inverseJoinColumns = @JoinColumn(name = "technician_id")
     )
-    private List<Users> technicians = new ArrayList<>();
+    private List<Users> technicians;
 }

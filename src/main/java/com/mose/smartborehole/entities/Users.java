@@ -33,6 +33,14 @@ public class Users implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role; // ADMIN, TECHNICIAN,USER
 
+
+    @ManyToMany(mappedBy = "technicians")
+    private List<Boreholes> assignedBoreholes;
+
+    @ManyToOne
+    @JoinColumn(name = "borehole_id")
+    private Boreholes borehole;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

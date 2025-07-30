@@ -1,6 +1,7 @@
 package com.mose.smartborehole.services;
 
 import com.mose.smartborehole.dto.MaintenanceLogDTO;
+import com.mose.smartborehole.dto.MaintenanceLogRequest;
 import com.mose.smartborehole.entities.Boreholes;
 import com.mose.smartborehole.entities.MaintenanceLogs;
 import com.mose.smartborehole.entities.Users;
@@ -11,38 +12,40 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MaintenanceService {
-    private final MaintenanceRepository logRepository;
-    private final BoreholeRepository boreholeRepository;
-    private final UserRepository userRepository;
+    private final MaintenanceRepository logsRepository;
+    private final BoreholeRepository boreholesRepository;
+    private final UserRepository usersRepository;
 
-    public void createLog(MaintenanceLogDTO dto, Authentication auth) {
-        Users user = userRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("User not found: " + auth.getName()));
+    public MaintenanceLogs createLog(MaintenanceLogRequest dto) {
+        var borehole = boreholesRepository.findById(dto.boreholeId())
+                .orElseThrow(() -> new RuntimeException("Borehole not found"));
+        var user = usersRepository.findById(dto.userId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Boreholes borehole = boreholeRepository.findById(dto.getBoreholeId())
-                .orElseThrow(() -> new RuntimeException("Borehole not found with ID: " + dto.getBoreholeId()));
-
-
-        MaintenanceLogs log = MaintenanceLogs.builder()
-                .description(dto.getDescription())
-                .status(dto.getStatus())
-                .date(dto.getDate())
+        var log = MaintenanceLogs.builder()
+                .description(dto.description())
+                .status(dto.status())
+                .date(LocalDateTime.now())
                 .borehole(borehole)
                 .performedBy(user)
                 .build();
 
-        logRepository.save(log);
+        return logsRepository.save(log);
     }
 
-    public List<MaintenanceLogs> getLogsForBorehole(UUID boreholeId) {
-        Boreholes borehole = boreholeRepository.findById(boreholeId)
-                .orElseThrow();
-        return logRepository.findByBorehole(borehole);
+    public List<MaintenanceLogs> getLogsByBorehole(UUID boreholeId) {
+        return logsRepository.findByBorehole_Id(boreholeId);
     }
+
+    public List<MaintenanceLogs> getAllLogs() {
+        return logsRepository.findAll();
+    }
+
 }

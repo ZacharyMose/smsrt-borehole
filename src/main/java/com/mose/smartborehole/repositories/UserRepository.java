@@ -1,8 +1,10 @@
 package com.mose.smartborehole.repositories;
 
+import com.mose.smartborehole.entities.Role;
 import com.mose.smartborehole.entities.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

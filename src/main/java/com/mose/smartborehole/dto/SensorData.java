@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class SensorData {
     private Double distance;
-    private Double vibration;
+    private Double waterLevel;
+    private String pumpStatus;
 }

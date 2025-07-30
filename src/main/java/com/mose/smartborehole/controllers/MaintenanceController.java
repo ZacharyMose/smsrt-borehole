@@ -1,6 +1,7 @@
 package com.mose.smartborehole.controllers;
 
 import com.mose.smartborehole.dto.MaintenanceLogDTO;
+import com.mose.smartborehole.dto.MaintenanceLogRequest;
 import com.mose.smartborehole.entities.MaintenanceLogs;
 import com.mose.smartborehole.services.MaintenanceService;
 import lombok.RequiredArgsConstructor;
@@ -16,16 +17,21 @@ import java.util.UUID;
 @RequestMapping("/api/maintenance")
 public class MaintenanceController {
 
-    private final MaintenanceService maintenanceLogService;
+    private final MaintenanceService logsService;
 
     @PostMapping
-    public ResponseEntity<Void> logMaintenance(@RequestBody MaintenanceLogDTO dto, Authentication auth) {
-        maintenanceLogService.createLog(dto, auth);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<MaintenanceLogs> createLog(@RequestBody MaintenanceLogRequest dto) {
+        var log = logsService.createLog(dto);
+        return ResponseEntity.ok(log);
     }
 
-    @GetMapping("/{boreholeId}")
-    public ResponseEntity<List<MaintenanceLogs>> getLogs(@PathVariable UUID boreholeId) {
-        return ResponseEntity.ok(maintenanceLogService.getLogsForBorehole(boreholeId));
+    @GetMapping
+    public ResponseEntity<List<MaintenanceLogs>> getAllLogs() {
+        return ResponseEntity.ok(logsService.getAllLogs());
+    }
+
+    @GetMapping("/borehole/{id}")
+    public ResponseEntity<List<MaintenanceLogs>> getLogsByBorehole(@PathVariable UUID id) {
+        return ResponseEntity.ok(logsService.getLogsByBorehole(id));
     }
 }

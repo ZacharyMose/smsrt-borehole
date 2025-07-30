@@ -1,43 +1,36 @@
 package com.mose.smartborehole.services;
 
+import com.mose.smartborehole.entities.Alerts;
+import com.mose.smartborehole.entities.Users;
+import com.mose.smartborehole.repositories.AlertRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AlertService {
 
-    private final EmailService emailService;
+    @Autowired
+    private AlertRepository alertsRepository;
 
-    // Thresholds
-    private static final double WATER_LEVEL_THRESHOLD = 20.0;  // cm
-    private static final String PUMP_STATUS_THRESHOLD = "OFF";
+    public Alerts createAlert(Users user, String title, String message) {
+        Alerts alert = new Alerts(title, message, user);
+        return alertsRepository.save(alert);
+    }
 
-    // Static recipients for now — you can make this dynamic based on borehole later
-    private final List<String> alertRecipients = List.of("mosezachary198@gmail.com", "technician@example.com");
+    public List<Alerts> getUserAlerts(Users user) {
+        return alertsRepository.findByUserOrderByCreatedAtDesc(user);
+    }
 
-    public void checkAndSendAlerts(String boreholeName, double waterLevel, String pumpStatus) {
-        String subject = "⚠ Borehole Alert: " + boreholeName;
-        StringBuilder body = new StringBuilder();
-
-        boolean alertTriggered = false;
-
-        if (waterLevel < WATER_LEVEL_THRESHOLD) {
-            body.append("• Water level is too low: ").append(waterLevel).append(" cm.<br>");
-            alertTriggered = true;
-        }
-
-        if (PUMP_STATUS_THRESHOLD.equalsIgnoreCase(pumpStatus)) {
-            body.append("• Pump is currently OFF.<br>");
-            alertTriggered = true;
-        }
-
-        if (alertTriggered) {
-            body.insert(0, "<h2>Borehole Alert Triggered!</h2>");
-            body.append("<br><i>Respond immediately.</i>");
-            emailService.sendAlertEmail(alertRecipients, subject, body.toString());
-        }
+    public void markAsRead(Long alertId) {
+        Alerts alert = alertsRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+        alert.setRead(true);
+        alertsRepository.save(alert);
     }
 }
